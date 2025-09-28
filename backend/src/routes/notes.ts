@@ -216,7 +216,11 @@ router.put('/:id', [
     });
   }
 
-  if (!note.canEdit(new mongoose.Types.ObjectId(userId))) {
+  // Check if user can edit (author or collaborator)
+  const canEdit = note.author.toString() === userId || 
+                  note.collaborators.some(collabId => collabId.toString() === userId);
+  
+  if (!canEdit) {
     return res.status(403).json({
       success: false,
       message: 'You do not have permission to edit this note',

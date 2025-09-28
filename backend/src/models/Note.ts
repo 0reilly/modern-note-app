@@ -68,9 +68,9 @@ const noteSchema = new Schema<INote>(
     timestamps: true,
     toJSON: {
       transform: (doc, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
+        ret['id'] = ret['_id'];
+        delete ret['_id'];
+        delete ret['__v'];
         return ret;
       },
     },
@@ -91,30 +91,5 @@ noteSchema.pre('save', function (next) {
   }
   next();
 });
-
-// Virtual for checking if a user is a collaborator
-noteSchema.virtual('isCollaborator').get(function (this: INote) {
-  return (userId: Types.ObjectId) => {
-    return this.collaborators.some(collabId => collabId.equals(userId));
-  };
-});
-
-// Static method to find notes by user (author or collaborator)
-noteSchema.statics.findByUser = function (userId: Types.ObjectId) {
-  return this.find({
-    $or: [
-      { author: userId },
-      { collaborators: userId },
-    ],
-  });
-};
-
-// Instance method to check if user can edit
-noteSchema.methods.canEdit = function (userId: Types.ObjectId): boolean {
-  return (
-    this.author.equals(userId) ||
-    this.collaborators.some((collabId: Types.ObjectId) => collabId.equals(userId))
-  );
-};
 
 export const Note = mongoose.model<INote>('Note', noteSchema);

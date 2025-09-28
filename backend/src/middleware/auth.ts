@@ -23,7 +23,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
   }
 
   try {
-    const jwtSecret = process.env.JWT_SECRET;
+    const jwtSecret = process.env['JWT_SECRET'];
     if (!jwtSecret) {
       throw new Error('JWT_SECRET environment variable is not defined');
     }
@@ -42,13 +42,13 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
 
 export const authenticateSocket = (socket: Socket, next: (err?: Error) => void): void => {
   try {
-    const token = socket.handshake.auth.token || socket.handshake.headers.authorization?.split(' ')[1];
+    const token = socket.handshake.auth['token'] || socket.handshake.headers.authorization?.split(' ')[1];
 
     if (!token) {
       return next(new Error('Authentication error: No token provided'));
     }
 
-    const jwtSecret = process.env.JWT_SECRET;
+    const jwtSecret = process.env['JWT_SECRET'];
     if (!jwtSecret) {
       throw new Error('JWT_SECRET environment variable is not defined');
     }

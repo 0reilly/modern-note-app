@@ -10,15 +10,14 @@ const router = express.Router();
 
 // Generate JWT token
 const generateToken = (userId: string, email: string): string => {
-  const jwtSecret = process.env.JWT_SECRET;
+  const jwtSecret = process.env['JWT_SECRET'];
   if (!jwtSecret) {
     throw new Error('JWT_SECRET environment variable is not defined');
   }
 
   return jwt.sign(
     { userId, email },
-    jwtSecret,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    jwtSecret
   );
 };
 
@@ -35,7 +34,7 @@ router.post('/register', [
     .trim()
     .isLength({ min: 2, max: 50 })
     .withMessage('Name must be between 2 and 50 characters'),
-], asyncHandler(async (req, res) => {
+], asyncHandler(async (req: express.Request, res: express.Response) => {
   // Check for validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -95,7 +94,7 @@ router.post('/login', [
   body('password')
     .notEmpty()
     .withMessage('Password is required'),
-], asyncHandler(async (req, res) => {
+], asyncHandler(async (req: express.Request, res: express.Response) => {
   // Check for validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -147,7 +146,7 @@ router.post('/login', [
 }));
 
 // Get current user
-router.get('/me', authenticateToken, asyncHandler(async (req: any, res) => {
+router.get('/me', authenticateToken, asyncHandler(async (req: any, res: express.Response) => {
   const user = await User.findById(req.user.userId);
   
   if (!user) {
@@ -179,7 +178,7 @@ router.put('/profile', authenticateToken, [
     .trim()
     .isLength({ min: 2, max: 50 })
     .withMessage('Name must be between 2 and 50 characters'),
-], asyncHandler(async (req: any, res) => {
+], asyncHandler(async (req: any, res: express.Response) => {
   // Check for validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

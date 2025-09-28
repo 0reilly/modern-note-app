@@ -30,10 +30,3 @@ export const logger = winston.createLogger({
     }),
   ],
 });
-
-// Create a stream object for Morgan
-logger.stream = {
-  write: (message: string) => {
-    logger.info(message.trim());
-  },
-};
